@@ -12,11 +12,9 @@ namespace Core {
         
         private const string SettingsFileName = "savedSettings.sherry";
         private const string GameDataFileName = "saveGames.sherry";
-        private const string LogsFileName = "gameLogs.sherry";
         
         private static readonly string SavedGameFilesPath = Path.Combine( Application.persistentDataPath, GameDataFileName );
         private static readonly string SavedSettingsFilesPath = Path.Combine( Application.persistentDataPath, SettingsFileName );
-        private static readonly string LogsFilesPath = Path.Combine( Application.persistentDataPath, LogsFileName );
 
         /// <summary>This function is used to initialize data everytime game starts.</summary>
         public static void InitializeData() {
@@ -24,7 +22,7 @@ namespace Core {
             gameData = LoadData();
             settingsData = LoadSettings();
         }
-        
+
         /// <summary>This function is used to save game data to a file.</summary>
         public static void SaveData() {
             
@@ -53,7 +51,7 @@ namespace Core {
 
             if( !File.Exists( SavedGameFilesPath ) ) {
 
-                Debugger.Log( $"No file found with name: {SavedGameFilesPath}", LogLevel.High );
+                Debugger.Log( $"No file found with name: {SavedGameFilesPath}", LogSeverity.High );
                 return GameData.CreateDefault();
             }
             
@@ -72,7 +70,7 @@ namespace Core {
         public static void DeleteGameData() {
             
             File.Delete( SavedGameFilesPath );
-            Debugger.Log( $"Deleted File: {SavedGameFilesPath}", LogLevel.Critical );
+            Debugger.Log( $"Deleted File: {SavedGameFilesPath}", LogSeverity.Critical );
         }
 
         /// <summary>This function is used to save settings data to a file</summary>
@@ -103,7 +101,7 @@ namespace Core {
             
             if( !File.Exists( SavedSettingsFilesPath ) ) {
 
-                Debugger.Log( $"No file found with name: {SavedSettingsFilesPath}", LogLevel.High );
+                Debugger.Log( $"No file found with name: {SavedSettingsFilesPath}", LogSeverity.High );
                 return SettingsData.CreateDefault();
             }
             
@@ -122,7 +120,7 @@ namespace Core {
         public static void DeleteSettings() {
             
             File.Delete( SavedSettingsFilesPath );
-            Debugger.Log( $"Deleted File: {SavedSettingsFilesPath}", LogLevel.Critical );
+            Debugger.Log( $"Deleted File: {SavedSettingsFilesPath}", LogSeverity.Critical );
         }
 
     }

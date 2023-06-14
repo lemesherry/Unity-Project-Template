@@ -7,22 +7,14 @@ namespace Core {
     public class Test : MonoBehaviour {
 
         [Button]
-        public void SaveSettings() {
-
-            DataManager.SaveSettings();
-        }
+        public void SaveSettings() => DataManager.SaveSettings();
 
         [Button]
-        public void LoadSettings() {
-
-            DataManager.LoadSettings();
-        }
+        public void LoadSettings() => DataManager.LoadSettings();
 
         [Button]
-        public void DeleteSettings() {
-            
-            DataManager.DeleteSettings();
-        }
+        public void DeleteSettings() => DataManager.DeleteSettings();
+
     }
 
 }
