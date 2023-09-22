@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Customs/Feel/FeelDemosURP/Strike/StrikeURP.unity
+    guid: 471afda64b8263d419ccd35e8af5c7ae
+  - enabled: 1
+    path: Assets/Scenes/Gameplay/Main.unity
+    guid: a7e6d25d5c0be3e4b8559223452c5abb
   m_configObjects: {}
