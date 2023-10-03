@@ -4,12 +4,12 @@ using System.Linq;
 using Managers;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using Debug = Core.Debug;
 
 namespace UI.Panels {
 
     public enum PanelType {
 
+        None,
         Gameplay,
         MainMenu,
         LevelFail,
@@ -20,14 +20,14 @@ namespace UI.Panels {
 
     }
 
-    public class Panel: MonoBehaviour {
+    public class PanelBase: MonoBehaviour {
 
         public bool IsActive => gameObject.activeSelf;
-        public PanelType type;
+        [ReadOnly] public PanelType type;
         public Transform objectToAnimate;
 
-        private static readonly List<Panel> Inheritors = new();
-        private static readonly Dictionary<PanelType, Type> PanelTypeToPanelMap = new() {
+        private static readonly List<PanelBase> Inheritors = new();
+        private static readonly Dictionary<PanelType, Type> TypeMap = new() {
             {
                 PanelType.AdPanel, typeof(AdPanel)
             }, {
@@ -38,12 +38,17 @@ namespace UI.Panels {
                 PanelType.Exit, typeof(ExitPanel)
             }, {
                 PanelType.LevelFail, typeof(LevelFailPanel)
+            }, {
+                PanelType.LevelComplete, typeof(LevelCompletePanel)
+            }, {
+                PanelType.MainMenu, typeof(MainMenuPanel)
             },
         };
 
         private void OnValidate() {
 
             if( objectToAnimate == null ) objectToAnimate = transform.GetChild( 1 );
+            type = type == PanelType.None ? GetType( GetType() ) : type;
         }
 
         protected virtual void Awake() {
@@ -55,46 +60,43 @@ namespace UI.Panels {
             DeInitialize();
         }
 
-        protected virtual void Initialize() {
+        private void Initialize() {
             if( !Inheritors.Contains( this ) ) Inheritors.Add( this );
+            if( type is PanelType.None ) type = GetType( GetType() );
         }
-        protected virtual void DeInitialize() {
+        private void DeInitialize() {
             if( Inheritors.Contains( this ) ) Inheritors.Remove( this );
+            if( type is not PanelType.None ) type = PanelType.None;
         }
 
-        private static List<Panel> GetInheritors() => Inheritors;
+        private static List<PanelBase> GetInheritors() => Inheritors;
 
-        public static T GetPanelOfType<T>() where T : Panel {
-            var panelType = GetPanelTypeForType( typeof(T) );
-
-            var panel = GetInheritors().FirstOrDefault( inheritor => inheritor.type == panelType );
-
-            return (T)panel;
+        public static T GetPanelOfType<T>() where T : PanelBase {
+            
+            var _t = typeof(T);
+        
+            var objectOfType = Inheritors.FirstOrDefault( inheritor => inheritor.GetType() == _t );
+        
+            return (T)objectOfType;
         }
 
-        public static Panel GetMainPanelOfType<T>() where T : Panel {
-            var panelType = GetPanelTypeForType( typeof(T) );
-
-            return GetInheritors().FirstOrDefault( inheritor => inheritor.type == panelType );
-        }
-
-        private static PanelType GetPanelTypeForType( Type panelType ) {
-            foreach( KeyValuePair<PanelType, Type> entry in PanelTypeToPanelMap.Where(
-                entry => entry.Value == panelType ) ) {
+        private static PanelType GetType( Type panelType ) {
+            foreach( KeyValuePair<PanelType, Type> entry in TypeMap.Where( entry =>
+                entry.Value == panelType ) ) {
                 return entry.Key;
             }
 
             throw new ArgumentException( $"Panel type {panelType} not found in the mapping." );
         }
 
-        public virtual void Enable( Action onAnimationComplete = null ) {
+        public virtual void Enable( float delay = 0, Action onAnimationComplete = null ) {
 
             gameObject.SetActive( true );
             AudioManager.PlaySound();
             GameManager.isGamePlaying = false;
         }
 
-        public virtual void Disable( Action onAnimationComplete = null ) {
+        public virtual void Disable( float delay = 0, Action onAnimationComplete = null ) {
 
             AudioManager.PlaySound();
             GameManager.isGamePlaying = true;

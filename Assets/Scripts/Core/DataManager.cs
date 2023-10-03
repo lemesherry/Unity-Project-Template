@@ -146,7 +146,7 @@ namespace Core {
         [field: SerializeField] public bool IsTutorialPlayed { get; set; }
         [field: SerializeField] public int LogsSessionsCount { get; set; }
         [field: SerializeField] public long HighScore { get; set; }
-        [field: SerializeField] public PowerUps PowerUps { get; set; }
+        [field: SerializeField] public PowerUpCounts PowerUpCounts { get; set; }
 
         /// <returns>A new struct with default values.</returns>
         public static GameData CreateDefault() => new( true );
@@ -158,19 +158,19 @@ namespace Core {
             IsTutorialPlayed = false;
             LogsSessionsCount = 0;
             HighScore = 0;
-            PowerUps = new PowerUps();
+            PowerUpCounts = new PowerUpCounts();
         }
 
     }
 
     [Serializable]
-    public struct PowerUps {
+    public struct PowerUpCounts {
 
-        public int powerUp1Count;
-        public int powerUp2Count;
-        public int powerUp3Count;
-        public int powerUp4Count;
-        public int powerUp5Count;
+        public int powerUp1;
+        public int powerUp2;
+        public int powerUp3;
+        public int powerUp4;
+        public int powerUp5;
 
     }
 

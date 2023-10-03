@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Core;
 using DG.Tweening;
 using Managers;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,27 +12,30 @@ using Debug = Core.Debug;
 
 namespace UI.Panels {
 
-    public class GameplayPanel: Panel {
+    public class GameplayPanel: PanelBase {
 
-        [SerializeField] private GameplayPanelSettings settings;
-        internal static PowerUpType currentPowerUp = PowerUpType.None;
+        [FoldoutGroup("Settings"), SerializeField] public Button bomb;
+        [FoldoutGroup("Settings"), SerializeField] public Button mystery;
+        [FoldoutGroup("Settings"), SerializeField] public Button removeAds;
 
-        public override void Enable( Action onAnimationComplete = null ) {
+        [FoldoutGroup("Settings"), SerializeField] public List<PowerUpIcons> powerUps;
+        
+        public override void Enable( float delay = 0, Action onAnimationComplete = null ) {
 
-            base.Enable( onAnimationComplete );
+            base.Enable( delay, onAnimationComplete );
 
             objectToAnimate.localScale = Vector3.zero;
-            objectToAnimate.DOScale( Vector3.one, 0.2f ).OnComplete( () => {
+            objectToAnimate.DOScale( Vector3.one, 0.2f ).SetDelay( delay ).OnComplete( () => {
 
                 onAnimationComplete?.Invoke();
             } );
         }
 
-        public override void Disable( Action onAnimationComplete = null ) {
+        public override void Disable( float delay = 0, Action onAnimationComplete = null ) {
 
-            base.Disable( onAnimationComplete );
+            base.Disable( delay, onAnimationComplete );
 
-            objectToAnimate.DOScale( Vector3.zero, 0.2f ).OnComplete( () => {
+            objectToAnimate.DOScale( Vector3.zero, 0.2f ).SetDelay( delay ).OnComplete( () => {
 
                 onAnimationComplete?.Invoke();
                 gameObject.SetActive( false );
@@ -42,19 +46,19 @@ namespace UI.Panels {
         
         public void PowerUp1() {
 
-            var gameDataPowerUps = DataManager.gameData.PowerUps;
+            var gameDataPowerUps = DataManager.gameData.PowerUpCounts;
 
-            if( gameDataPowerUps.powerUp1Count <= 0 ) {
+            if( gameDataPowerUps.powerUp1 <= 0 ) {
 
                 var adPanel = GetPanelOfType<AdPanel>();
                 if( adPanel == null ) return;
 
-                adPanel.OpenAdPanel( PowerUpType.PowerUp1 );
+                // adPanel.OpenAdPanel( PowerUpType.PowerUp1 );
             } else {
 
                 AudioManager.PlaySound();
 
-                gameDataPowerUps.powerUp1Count--;
+                gameDataPowerUps.powerUp1--;
                 SetPowerUpIcons( gameDataPowerUps );
 
                 // EventsManager.SendPowerUpUsedEvent( PowerUpType.SkipLevel );
@@ -63,19 +67,19 @@ namespace UI.Panels {
 
         public void PowerUp2() {
 
-            var gameDataPowerUps = DataManager.gameData.PowerUps;
+            var gameDataPowerUps = DataManager.gameData.PowerUpCounts;
 
-            if( gameDataPowerUps.powerUp2Count <= 0 ) {
+            if( gameDataPowerUps.powerUp2 <= 0 ) {
 
                 var adPanel = GetPanelOfType<AdPanel>();
                 if( adPanel == null ) return;
 
-                adPanel.OpenAdPanel( PowerUpType.PowerUp2 );
+                // adPanel.OpenAdPanel( PowerUpType.PowerUp2 );
             } else {
 
                 AudioManager.PlaySound();
 
-                gameDataPowerUps.powerUp2Count--;
+                gameDataPowerUps.powerUp2--;
                 SetPowerUpIcons( gameDataPowerUps );
 
                 // EventsManager.SendPowerUpUsedEvent( PowerUpType.Hint );
@@ -84,51 +88,51 @@ namespace UI.Panels {
         
         internal void GivePowerUp() {
 
-            var gameDataPowerUps = DataManager.gameData.PowerUps;
+            var gameDataPowerUps = DataManager.gameData.PowerUpCounts;
 
-            switch( currentPowerUp ) {
-
-            case PowerUpType.PowerUp1:
-                gameDataPowerUps.powerUp1Count += settings.powerUps[0].countToAdd;
-
-                // EventsManager.SendPowerUpAddedEvent( currentPowerUp, Instance.powerUpsToAdd.skipLevelCount );
-
-                break;
-            case PowerUpType.PowerUp2:
-                gameDataPowerUps.powerUp2Count += settings.powerUps[1].countToAdd;
-
-                // EventsManager.SendPowerUpAddedEvent( currentPowerUp, Instance.powerUpsToAdd.hintCount );
-
-                break;
-            case PowerUpType.None:
-            default:
-                break;
-            }
+            // switch( currentPowerUp ) {
+            //
+            // case PowerUpType.PowerUp1:
+            //     gameDataPowerUps.powerUp1Count += powerUps[0].countToAdd;
+            //
+            //     // EventsManager.SendPowerUpAddedEvent( currentPowerUp, Instance.powerUpsToAdd.skipLevelCount );
+            //
+            //     break;
+            // case PowerUpType.PowerUp2:
+            //     gameDataPowerUps.powerUp2Count += powerUps[1].countToAdd;
+            //
+            //     // EventsManager.SendPowerUpAddedEvent( currentPowerUp, Instance.powerUpsToAdd.hintCount );
+            //
+            //     break;
+            // case PowerUpType.None:
+            // default:
+            //     break;
+            // }
 
             SetPowerUpIcons( gameDataPowerUps );
         }
         
-        private void SetPowerUpIcons( PowerUps powerUps ) {
+        private void SetPowerUpIcons( PowerUpCounts powerUpCount ) {
 
-            if( powerUps.powerUp1Count <= 0 ) {
-                settings.powerUps[0].adIcon.SetActive( true );
-                settings.powerUps[0].countText.gameObject.SetActive( false );
+            if( powerUpCount.powerUp1 <= 0 ) {
+                powerUps[0].adIcon.SetActive( true );
+                powerUps[0].countText.gameObject.SetActive( false );
             } else {
-                settings.powerUps[0].adIcon.SetActive( false );
-                settings.powerUps[0].countText.gameObject.SetActive( true );
-                settings.powerUps[0].countText.text = $"{powerUps.powerUp1Count}";
+                powerUps[0].adIcon.SetActive( false );
+                powerUps[0].countText.gameObject.SetActive( true );
+                powerUps[0].countText.text = $"{powerUpCount.powerUp1}";
             }
 
-            if( powerUps.powerUp1Count <= 0 ) {
-                settings.powerUps[1].adIcon.SetActive( true );
-                settings.powerUps[1].countText.gameObject.SetActive( false );
+            if( powerUpCount.powerUp1 <= 0 ) {
+                powerUps[1].adIcon.SetActive( true );
+                powerUps[1].countText.gameObject.SetActive( false );
             } else {
-                settings.powerUps[1].adIcon.SetActive( false );
-                settings.powerUps[1].countText.gameObject.SetActive( true );
-                settings.powerUps[1].countText.text = $"{powerUps.powerUp1Count}";
+                powerUps[1].adIcon.SetActive( false );
+                powerUps[1].countText.gameObject.SetActive( true );
+                powerUps[1].countText.text = $"{powerUpCount.powerUp1}";
             }
 
-            DataManager.gameData.PowerUps = powerUps;
+            DataManager.gameData.PowerUpCounts = powerUpCount;
         }
         
         private async void AnimatePowerUps() {
@@ -136,8 +140,8 @@ namespace UI.Panels {
             var animationDuration = 0.2f;
             var delayTime = (int)(1000 * animationDuration / 2);
 
-            var skipLevel = settings.bomb.transform.parent;
-            var hint = settings.mystery.transform.parent;
+            var skipLevel = bomb.transform.parent;
+            var hint = mystery.transform.parent;
 
             skipLevel.localScale = new Vector3( 0.8f, 0.8f, 0.8f );
             hint.localScale = new Vector3( 0.8f, 0.8f, 0.8f );
@@ -158,17 +162,6 @@ namespace UI.Panels {
         }
 
     }
-
-    [Serializable]
-    public struct GameplayPanelSettings {
-
-        public Button bomb;
-        public Button mystery;
-        public Button removeAds;
-
-        public List<PowerUpIcons> powerUps;
-    }
-    
     
     [Serializable]
     public struct PowerUpIcons {

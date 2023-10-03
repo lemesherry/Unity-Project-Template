@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Core;
@@ -40,6 +41,19 @@ namespace Managers {
             if( Instance != null ) Destroy( Instance.gameObject );
             Instance = this;
 
+        }
+        
+        public void RestartLevel() {
+
+            GameManager.isGamePlaying = false;
+
+            // if( GameManager.Testing.enableInterstitialAds ) InterstitialAd.ShowAd();
+
+            AudioManager.PlaySound();
+
+            HapticPatterns.PlayPreset( HapticPatterns.PresetType.Selection );
+
+            InvokeOnLevelRestart();
         }
 
         public static void InvokeOnLevelFailed() {
@@ -90,7 +104,6 @@ namespace Managers {
         private static void OnOnLevelInitiate() {
             
             Debug.Log( "Event Raised: Level Initiate" );
-            Panel.GetMainPanelOfType<GameplayPanel>().Enable();
             
             if( Instance == null ) return;
         }
@@ -111,7 +124,7 @@ namespace Managers {
 
         private static void OnOnLevelRestart() {
 
-            Debug.Log( "Event Raised: Level Fail" );
+            Debug.Log( "Event Raised: Level Restart" );
 
             if( Instance == null ) return;
 
@@ -121,11 +134,12 @@ namespace Managers {
             SceneManager.LoadScene( SceneManager.GetActiveScene().buildIndex );
         }
 
+        private IEnumerator RestartWithDelay() {
 
-
-
-
-
+            yield return new WaitForSeconds( 0.5f );
+            
+            SceneManager.LoadScene( SceneManager.GetActiveScene().buildIndex );
+        }
     }
 
 }

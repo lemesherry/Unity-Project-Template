@@ -1,60 +1,61 @@
 using System;
 using DG.Tweening;
 using Managers;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 
 namespace UI.Panels {
 
-    public class AdPanel: Panel {
+    public class AdPanel: PanelBase {
 
-        [SerializeField] private AdPanelSettings settings;
-        
-        public override void Enable( Action onAnimationComplete = null ) {
+        [FoldoutGroup("Settings"), SerializeField] public TextMeshProUGUI adPanelText;
 
-            base.Enable( onAnimationComplete );
+        public override void Enable( float delay = 0, Action onAnimationComplete = null ) {
+
+            base.Enable( delay, onAnimationComplete );
 
             objectToAnimate.localScale = Vector3.zero;
-            objectToAnimate.DOScale( Vector3.one, 0.2f ).OnComplete( () => {
+            objectToAnimate.DOScale( Vector3.one, 0.2f ).SetDelay( delay ).OnComplete( () => {
 
                 onAnimationComplete?.Invoke();
             } );
         }
 
-        public override void Disable( Action onAnimationComplete = null ) {
+        public override void Disable( float delay = 0, Action onAnimationComplete = null ) {
 
-            base.Disable( onAnimationComplete );
+            base.Disable( delay, onAnimationComplete );
 
-            objectToAnimate.DOScale( Vector3.zero, 0.2f ).OnComplete( () => {
+            objectToAnimate.DOScale( Vector3.zero, 0.2f ).SetDelay( delay ).OnComplete( () => {
 
                 onAnimationComplete?.Invoke();
                 gameObject.SetActive( false );
             } );
         }
         
-        internal void OpenAdPanel( PowerUpType powerUpType ) {
-
-            AudioManager.PlaySound();
-            GameManager.isGamePlaying = false;
-
-            GameplayPanel.currentPowerUp = powerUpType;
-
-            switch( powerUpType ) {
-            case PowerUpType.PowerUp1:
-                settings.adPanelText.text = "Watch an add to get \"Skip\" powerup?";
-
-                break;
-            case PowerUpType.PowerUp2:
-                settings.adPanelText.text = "Watch an add to get \"Hint\" powerup?";
-
-                break;
-            case PowerUpType.None:
-            default:
-                break;
-            }
-
-            Enable();
-        }
+        // internal void OpenAdPanel( PowerUpType powerUpType ) {
+        //
+        //     AudioManager.PlaySound();
+        //     GameManager.isGamePlaying = false;
+        //
+        //     GameplayPanel.currentPowerUp = powerUpType;
+        //
+        //     switch( powerUpType ) {
+        //     case PowerUpType.PowerUp1:
+        //         adPanelText.text = "Watch an add to get \"Skip\" powerup?";
+        //
+        //         break;
+        //     case PowerUpType.PowerUp2:
+        //         adPanelText.text = "Watch an add to get \"Hint\" powerup?";
+        //
+        //         break;
+        //     case PowerUpType.None:
+        //     default:
+        //         break;
+        //     }
+        //
+        //     Enable();
+        // }
 
         public void ShowAd( bool isAdPanel ) {
 
@@ -86,13 +87,6 @@ namespace UI.Panels {
         }
         
         public void ClosePanel() => Disable();
-
-    }
-
-    [Serializable]
-    public struct AdPanelSettings {
-
-        public TextMeshProUGUI adPanelText;
 
     }
 

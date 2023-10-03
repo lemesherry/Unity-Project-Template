@@ -3,16 +3,21 @@ using Core;
 using DG.Tweening;
 using Lofelt.NiceVibrations;
 using Managers;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
-using Debug = Core.Debug;
 
 namespace UI.Panels {
 
-    public class SettingsPanel: Panel {
+    public class SettingsPanel: PanelBase {
 
-        [SerializeField] private SettingPanelSettings settings;
-
+        [FoldoutGroup("Settings"), SerializeField] public Toggle music;
+        [FoldoutGroup("Settings"), SerializeField] public Toggle sound;
+        [FoldoutGroup("Settings"), SerializeField] public Toggle vibration;
+        [FoldoutGroup("Settings"), SerializeField] public Button removeAds;
+        [FoldoutGroup("Settings"), SerializeField] public Button restorePurchases;
+        [FoldoutGroup("Settings"), SerializeField] public Button contactUs;
+        
         private void OnEnable() {
             
             ChangeObjectVisuals();
@@ -21,9 +26,9 @@ namespace UI.Panels {
 
         private void ChangeObjectVisuals() {
 
-            if( settings.music != null ) settings.music.isOn = DataManager.settingsData.MusicOn;
-            if( settings.sound != null ) settings.sound.isOn = DataManager.settingsData.SoundOn;
-            if( settings.vibration != null ) settings.vibration.isOn = DataManager.settingsData.VibrationOn;
+            if( music != null ) music.isOn = DataManager.settingsData.MusicOn;
+            if( sound != null ) sound.isOn = DataManager.settingsData.SoundOn;
+            if( vibration != null ) vibration.isOn = DataManager.settingsData.VibrationOn;
         }
 
         private void SetSettings() {
@@ -33,27 +38,27 @@ namespace UI.Panels {
 
             HapticController.hapticsEnabled = DataManager.settingsData.VibrationOn;
 
-            if( settings.removeAds != null ) settings.removeAds.interactable = !DataManager.settingsData.RemovedAds;
-            if( settings.removeAds != null ) settings.removeAds.gameObject.SetActive( !DataManager.settingsData.RemovedAds );
-            if( settings.restorePurchases != null ) settings.restorePurchases.interactable = !DataManager.settingsData.RestoredPurchases;
+            if( removeAds != null ) removeAds.interactable = !DataManager.settingsData.RemovedAds;
+            if( removeAds != null ) removeAds.gameObject.SetActive( !DataManager.settingsData.RemovedAds );
+            if( restorePurchases != null ) restorePurchases.interactable = !DataManager.settingsData.RestoredPurchases;
         }
 
-        public override void Enable( Action onAnimationComplete = null ) {
+        public override void Enable( float delay = 0, Action onAnimationComplete = null ) {
             
-            base.Enable( onAnimationComplete );
+            base.Enable( delay, onAnimationComplete );
             
             objectToAnimate.localScale = Vector3.zero;
-            objectToAnimate.DOScale( Vector3.one, 0.2f ).OnComplete( () => {
+            objectToAnimate.DOScale( Vector3.one, 0.2f ).SetDelay( delay ).OnComplete( () => {
                 
                 onAnimationComplete?.Invoke();
             } );
         }
 
-        public override void Disable( Action onAnimationComplete = null ) {
+        public override void Disable( float delay = 0, Action onAnimationComplete = null ) {
             
-            base.Disable( onAnimationComplete );
+            base.Disable( delay, onAnimationComplete );
             
-            objectToAnimate.DOScale( Vector3.zero, 0.2f ).OnComplete( () => {
+            objectToAnimate.DOScale( Vector3.zero, 0.2f ).SetDelay( delay ).OnComplete( () => {
                 
                 onAnimationComplete?.Invoke();
                 gameObject.SetActive( false );
@@ -64,21 +69,21 @@ namespace UI.Panels {
         
         public void ToggleMusic() {
 
-            DataManager.settingsData.MusicOn = settings.music.isOn;
+            DataManager.settingsData.MusicOn = music.isOn;
             AudioManager.PlaySound();
             SetSettings();
         }
 
         public void ToggleSound() {
 
-            DataManager.settingsData.SoundOn = settings.sound.isOn;
+            DataManager.settingsData.SoundOn = sound.isOn;
             AudioManager.PlaySound();
             SetSettings();
         }
 
         public void ToggleVibration() {
 
-            DataManager.settingsData.VibrationOn = settings.vibration.isOn;
+            DataManager.settingsData.VibrationOn = vibration.isOn;
             AudioManager.PlaySound();
             SetSettings();
         }
@@ -103,18 +108,6 @@ namespace UI.Panels {
             Application.OpenURL( rateUsSite );
         }
 
-    }
-    
-    [Serializable]
-    public struct SettingPanelSettings {
-
-        public Toggle music;
-        public Toggle sound;
-        public Toggle vibration;
-        public Button removeAds;
-        public Button restorePurchases;
-        public Button contactUs;
 
     }
-
 }
